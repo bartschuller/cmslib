@@ -1,0 +1,40 @@
+@(id: Option[String], form: Form[User])(implicit handler: be.objectify.deadbolt.scala.DeadboltHandler, flash: Flash)
+
+@import be.objectify.deadbolt.scala.views.html._
+
+@import helper.bootstrap30._
+
+@main("New User") {
+  @helper.form(action = (if (id.isDefined) routes.UserController.edit(id.get) else routes.UserController.signup()), 'class -> "form-horizontal", 'role -> "form") {
+    <fieldset>
+      @helper.inputText(
+        form("name"),
+        '_label -> "User name",
+        'class -> "form-control"
+      )
+      @helper.inputPassword(
+        form("password.main"),
+        '_label -> "Password",
+        '_help -> "",
+        'placeholder -> "Must be at least 12 characters. ",
+        'class -> "form-control"
+      )
+      @helper.inputPassword(
+        form("password.confirm"),
+        '_label -> "Repeat password",
+        'placeholder -> "Please repeat your password.",
+        '_error -> form.error("password"),
+        'class -> "form-control"
+      )
+      @helper.inputText(form("email"),
+        '_label -> "Email",
+        '_help -> "",
+        'placeholder -> "We need a valid email address for account recovery.",
+        'class -> "form-control"
+      )
+    </fieldset>
+    <div class="form-actions">
+      <input class="btn btn-primary" type="submit">
+    </div>
+  }
+}

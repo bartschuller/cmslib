@@ -1,4 +1,4 @@
-@(title: String)(content: Html)
+@(title: String)(content: Html)(implicit flash: Flash)
 <!DOCTYPE html>
 <html>
   <head>
@@ -6,11 +6,60 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Bootstrap -->
     <link href='@routes.WebJarAssets.at(WebJarAssets.locate("css/bootstrap.min.css"))' rel="stylesheet" media="screen">
+    <link href='@routes.Assets.at("css/cmslib.css")' rel="stylesheet" media="screen">
   </head>
   <body>
-    <div class="container">
-      <h1>Hello, world!</h1>
-      @content
+    <div class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="/">SMOP CMS</a>
+        </div>
+        <div class="collapse navbar-collapse">
+          <ul class="nav navbar-nav">
+            <li class="active"><a href="/">Home</a></li>
+            <li><a href="/user/new">Create User</a></li>
+          </ul>
+          <form class="navbar-form navbar-right" role="form">
+            <div class="form-group">
+              <label class="sr-only" for="userNameInput">User name</label>
+              <input type="text" name="userName" class="form-control" id="userNameInput" placeholder="Enter user name">
+            </div>
+            <div class="form-group">
+              <label class="sr-only" for="passwordInput">Password</label>
+              <input type="password" name="password" class="form-control" id="passwordInput" placeholder="Password">
+            </div>
+            <div class="btn-group" data-toggle="buttons">
+              <label class="btn btn-default">
+                <input type="checkbox" name="rememberMe"> Remember me
+              </label>
+            </div>
+            <button type="submit" class="btn btn-default">Log in</button>
+          </form>
+        </div><!--/.nav-collapse -->
+      </div>
     </div>
+
+    <div class="container">
+      @alert(alertType: String) = {
+        @flash.get(alertType).map { message =>
+          <div class="alert alert-dismissable alert-@alertType">
+            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&#215;</button>
+            @message
+          </div>
+        }
+      }
+
+      @alert("warning")
+      @alert("success")
+
+      @content
+    </div><!-- /.container -->
+    <script src='@routes.WebJarAssets.at(WebJarAssets.locate("jquery.min.js"))'></script>
+    <script src='@routes.WebJarAssets.at(WebJarAssets.locate("js/bootstrap.min.js"))'></script>
   </body>
 </html>

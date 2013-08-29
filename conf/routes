@@ -3,10 +3,15 @@
 # ~~~~
 
 # Home page
-GET        /                     controllers.Application.index
+GET         /                     controllers.Application.index
+
+GET         /user/new             controllers.UserController.createForm
+POST        /user/new             controllers.UserController.signup
+GET         /user/:id             controllers.UserController.editForm(id)
+POST        /user/:id             controllers.UserController.edit(id)
 
 # Map static resources from the /public folder to the /assets URL path
-GET        /assets/*file         controllers.Assets.at(path="/public", file)
+GET         /assets/*file         controllers.Assets.at(path="/public", file)
 
 # Enable webjar based resources to be returned
-GET        /webjars/*file        controllers.WebJarAssets.at(file)
+GET         /webjars/*file        controllers.WebJarAssets.at(file)

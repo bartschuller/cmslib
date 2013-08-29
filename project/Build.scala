@@ -9,12 +9,16 @@ object ApplicationBuild extends Build {
 
   val appDependencies = Seq(
     "org.webjars" %% "webjars-play" % "2.1.0-3",
-    "org.webjars" % "bootstrap" % "3.0.0"
+    "org.webjars" % "bootstrap" % "3.0.0",
+    "org.webjars" % "ckeditor" % "4.1.2",
+    "org.reactivemongo" %% "play2-reactivemongo" % "0.9",
+    "be.objectify" %% "deadbolt-scala" % "2.1-RC3",
+    "org.mindrot" % "jbcrypt" % "0.3m"
   )
 
 
   val main = play.Project(appName, appVersion, appDependencies).settings(
-    // Add your own project settings here      
+    resolvers += Resolver.url("Objectify Play Repository", url("http://schaloner.github.com/releases/"))(Resolver.ivyStylePatterns)
   )
 
 }
