@@ -1,4 +1,5 @@
-@(title: String)(content: Html)(implicit flash: Flash)
+@(title: String)(content: Html)(implicit deadbolt: security.CMSDeadboltHandler, flash: Flash)
+@import tags._
 <!DOCTYPE html>
 <html>
   <head>
@@ -9,40 +10,44 @@
     <link href='@routes.Assets.at("css/cmslib.css")' rel="stylesheet" media="screen">
   </head>
   <body>
-    <div class="navbar navbar-inverse navbar-fixed-top">
-      <div class="container">
-        <div class="navbar-header">
-          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </button>
-          <a class="navbar-brand" href="/">SMOP CMS</a>
-        </div>
-        <div class="collapse navbar-collapse">
-          <ul class="nav navbar-nav">
-            <li class="active"><a href="/">Home</a></li>
-            <li><a href="/user/new">Create User</a></li>
-          </ul>
-          <form class="navbar-form navbar-right" role="form">
+    <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="/">SMOP CMS</a>
+      </div>
+      <div class="collapse navbar-collapse">
+        <ul class="nav navbar-nav">
+          <li class="active"><a href="/">Home</a></li>
+          <li><a href="/user/new">Create User</a></li>
+        </ul>
+        @withUser{
+          @helper.form(routes.UserController.login, 'class -> "navbar-form navbar-right", 'role -> "form") {
             <div class="form-group">
               <label class="sr-only" for="userNameInput">User name</label>
-              <input type="text" name="userName" class="form-control" id="userNameInput" placeholder="Enter user name">
+              <input type="text" name="userName" class="form-control" id="userNameInput" placeholder="Log in as">
             </div>
             <div class="form-group">
               <label class="sr-only" for="passwordInput">Password</label>
               <input type="password" name="password" class="form-control" id="passwordInput" placeholder="Password">
             </div>
-            <div class="btn-group" data-toggle="buttons">
-              <label class="btn btn-default">
-                <input type="checkbox" name="rememberMe"> Remember me
+            <div class="form-group">
+              <label class="navbar-inverse-checkbox">
+                <input type="checkbox" value="true" name="rememberMe"> Remember me?
               </label>
             </div>
-            <button type="submit" class="btn btn-default">Log in</button>
-          </form>
+            <div class="form-group">
+              <button type="submit" class="btn btn-default">Log in</button>
+            </div>
+          }
+        }{user =>
+          <p class="nav navbar-right navbar-text"><a href="@routes.UserController.logout" onclick="return confirm('Are you sure you want to log out?')">Logged in</a> as <a href="@routes.UserController.edit(user.id.get)">@user.name</a></p>
+        }
         </div><!--/.nav-collapse -->
-      </div>
-    </div>
+    </nav>
 
     <div class="container">
       @alert(alertType: String) = {

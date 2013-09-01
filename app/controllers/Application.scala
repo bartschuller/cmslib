@@ -1,12 +1,11 @@
 package controllers
 
-import play.api._
 import play.api.mvc._
 
-object Application extends Controller {
+object Application extends Controller with CMSController {
   
-  def index = Action { implicit request =>
-    Ok(views.html.index("Your new application is ready."))
+  def index = withDeadbolt { implicit deadbolt => implicit request =>
+    Ok(views.html.index())
   }
   
 }

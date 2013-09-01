@@ -12,13 +12,12 @@ import play.api.data.validation.Constraints._
 /**
  * CMS User.
  * @param id MongoDB id
- * @param name user name
- * @param salt password salt
- * @param password password hashed with bcrypt using salt
+ * @param name edit name
+ * @param password password hashed with bcrypt
  * @param email email address
- * @param roles list of roles this user has
+ * @param roles list of roles this edit has
  */
-case class User( id: Option[BSONObjectID],
+case class User( id: Option[String],
             name: String,
             password: String,
             email: String,
@@ -33,14 +32,14 @@ case class User( id: Option[BSONObjectID],
 
   def getPermissions: JList[_ <: Permission] = ???
 
-  def getIdentifier: String = id.map(_.stringify).getOrElse(sys.error("User without BSONObjectID used for authorization"))
+  def getIdentifier: String = id.getOrElse(sys.error("User without ID used for authorization"))
 }
 
 object User {
   implicit object UserBSONReader extends BSONDocumentReader[User] {
     def read(doc: BSONDocument): User =
       User(
-        doc.getAs[BSONObjectID]("_id"),
+        doc.getAs[BSONObjectID]("_id").map(_.stringify),
         doc.getAsTry[String]("name").get,
         doc.getAsTry[String]("password").get,
         doc.getAsTry[String]("email").get,
@@ -49,7 +48,7 @@ object User {
   implicit object UserBSONWriter extends BSONDocumentWriter[User] {
     def write(user: User): BSONDocument =
       BSONDocument(
-        "_id" -> user.id.getOrElse(BSONObjectID.generate),
+        "_id" -> user.id.map(BSONObjectID(_)).getOrElse(BSONObjectID.generate),
         "name" -> user.name,
         "password" -> user.password,
         "email" -> user.email,
@@ -70,10 +69,10 @@ object User {
       "email" -> email
       ) { (id, name, password, email) =>
       User(
-        id.map(new BSONObjectID(_)), name, password._1, email, Seq())
+        id, name, password._1, email, Seq())
     } { user =>
       Some(
-        (user.id.map(_.stringify),
+        (user.id,
           user.name,
           ("", ""),
           user.email))

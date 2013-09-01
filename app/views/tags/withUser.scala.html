@@ -1,0 +1,2 @@
+@(noUser: => Html = Html(""))(body: (User) => Html)(implicit deadbolt: security.CMSDeadboltHandler)
+@{deadbolt.getUser.fold(noUser)(body)}

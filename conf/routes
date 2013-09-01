@@ -7,6 +7,8 @@ GET         /                     controllers.Application.index
 
 GET         /user/new             controllers.UserController.createForm
 POST        /user/new             controllers.UserController.signup
+POST        /user/login           controllers.UserController.login
+GET         /user/logout          controllers.UserController.logout
 GET         /user/:id             controllers.UserController.editForm(id)
 POST        /user/:id             controllers.UserController.edit(id)
 

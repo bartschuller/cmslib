@@ -9,6 +9,7 @@ import reactivemongo.bson.{BSONObjectID, BSONDocument}
 import models.User
 import scala.concurrent.Future
 import be.objectify.deadbolt.core.DeadboltAnalyzer
+import play.api.libs.Crypto
 
 trait CMSController extends MongoController with DeadboltActions { self: Controller =>
   private val userCollection = db[BSONCollection]("users")
@@ -16,7 +17,17 @@ trait CMSController extends MongoController with DeadboltActions { self: Control
   def withDeadbolt(f: CMSDeadboltHandler => Request[AnyContent] => Result): Action[AnyContent] = {
     Action { request =>
 
-      val userId = request.session.get("userId")
+      val userId = request.session.get("userId").orElse {
+        for {
+          cookie <- request.cookies.get("rememberMe")
+          value = cookie.value
+          sep = value.indexOf("-")
+          if sep > 0
+          sign = value.substring(0, sep)
+          id = value.substring(sep + 1)
+          if Crypto.sign(id) == sign
+        } yield id
+      }
       val account = userId.fold[Future[Option[User]]](Future(None))(
         id => userCollection.find(BSONDocument("_id" -> new BSONObjectID(id))).one[User]
       )
