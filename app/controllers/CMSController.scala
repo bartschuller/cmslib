@@ -47,4 +47,15 @@ trait CMSController extends MongoController with DeadboltActions { self: Control
         } yield result).getOrElse(deadbolt.onAuthFailure(request))
       } (identity)
     }
+
+  def dynamicRestrictions(name: String, meta: String)(f: CMSDeadboltHandler => Request[AnyContent] => Result): Action[AnyContent] =
+    withDeadbolt { deadbolt => request =>
+      deadbolt.beforeAuthCheck(request).fold {
+        (for {
+          dynHandler <- deadbolt.getDynamicResourceHandler(request)
+          if dynHandler.isAllowed(name, meta, deadbolt, request)
+          result = f(deadbolt)(request)
+        } yield result).getOrElse(deadbolt.onAuthFailure(request))
+      } (identity)
+    }
 }

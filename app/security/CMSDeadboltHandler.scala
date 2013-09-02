@@ -18,5 +18,5 @@ class CMSDeadboltHandler(val user: Future[Option[User]]) extends DeadboltHandler
   def onAuthFailure[A](request: Request[A]): Result =
     Results.Redirect(controllers.routes.Application.index()).flashing("warning" -> Messages("error.authorisation"))
 
-  def getDynamicResourceHandler[A](request: Request[A]): Option[DynamicResourceHandler] = None
+  def getDynamicResourceHandler[A](request: Request[A]): Option[DynamicResourceHandler] = Some(new CMSDynamicResourceHandler)
 }

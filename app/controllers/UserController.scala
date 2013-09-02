@@ -76,7 +76,7 @@ object UserController extends Controller with CMSController {
     Redirect(routes.Application.index).discardingCookies(DiscardingCookie("rememberMe")).withNewSession.flashing("success" -> "Logout succesful.")
   }
 
-  def editForm(id: String) = withDeadbolt { implicit deadbolt => implicit request =>
+  def editForm(id: String) = dynamicRestrictions("ownProfile", id) { implicit deadbolt => implicit request =>
     Async {
       collection.find(BSONDocument("_id" -> new BSONObjectID(id))).one[User].map( ou =>
         ou.fold[Result](NotFound)(user => Ok(views.html.user.edit(Some(id), User.form.fill(user))))
@@ -84,11 +84,11 @@ object UserController extends Controller with CMSController {
     }
   }
 
-  def edit(id: String) = hasAllRoles("admin") { implicit deadbolt => implicit request =>
+  def edit(id: String) = dynamicRestrictions("ownProfile", id) { implicit deadbolt => implicit request =>
     User.form.bindFromRequest.fold(
       formWithErrors => Ok(views.html.user.edit(Some(id), formWithErrors)),
       userNoCrypt => {
-        val user = userNoCrypt.copy(password = BCrypt.hashpw(userNoCrypt.password, BCrypt.gensalt))
+        val user = userNoCrypt.copy(id = Some(id), password = BCrypt.hashpw(userNoCrypt.password, BCrypt.gensalt))
         AsyncResult {
           collection.update(BSONDocument("_id" -> new BSONObjectID(id)), user).map(lastError =>
             if (lastError.ok)
